@@ -36,13 +36,18 @@ public:
 		memset(&(srv.sin_zero), 0, 8);
 	}
 
-	void Connect() {
+	void Connect(std::string l_name) 
+	{
+		
+		name = l_name;
+
 		int nRet = connect(nClientSocket, (struct sockaddr*)&srv, sizeof(srv));
 		if (nRet < 0) {
 			std::cout << std::endl << "Failed to connect";
 			WSACleanup();
 			exit(EXIT_FAILURE);
 		}
+		
 		else {
 			// We are connected on a fresh connection
 			// send name of this player to server
@@ -51,11 +56,10 @@ public:
 
 			// wait for a reply that tells me my playerID
 			char buff[7 + 1] = { 0, };
-			recv(nClientSocket, buff, MAX_BUFFER_SIZE, 0);
+			recv(nClientSocket, buff, sizeof(buff), 0);
 	
 			// convert return into an int
-			const char tmpID[1]{ buff[0] };
-			playerID = atoi(tmpID);
+			playerID = (int)buff[0] - (int)'0';
 			std::cout << std::endl << "This client's Player ID is:" << playerID;
 			
 			for (int i = 0; i < 8; i++)
@@ -80,66 +84,62 @@ private:
 	WSADATA ws;
 	int nClientSocket;
 	struct sockaddr_in srv;
-	char prevBuff[MAX_BUFFER_SIZE + 1]{ 0, };
+	char prevBuff[7 + 1]{ 0, };
 
 	void StartCommunication() {
-		char buff[MAX_BUFFER_SIZE + 1] = { 0, };
+		char buff[7 + 1] = { 0, };
 		while (true) {
-			
+			/*
 			send(nClientSocket, prevBuff, sizeof(prevBuff), 0);
 			recv(nClientSocket, buff, MAX_BUFFER_SIZE, 0);
 			for (int i = 0; i < 8; i++)
 			{
 				prevBuff[i] = buff[i];
 			}
-			playerID = buff[0] - '0';
-			std::cout << "I am player " << playerID << ", " << name;
 			std::string tmpStr = prevBuff;
-			std::cout << "The other player's data is: " << tmpStr;
+			int currID = buff[0] - '0';
+			if (currID == playerID)
+			{
+				std::cout << std::endl << "I am player " << playerID << ", " << name;
+			}
+			else
+			{
+				std::cout << std::endl << "The other player's data is " << tmpStr;
+			}*/
 			
+			SendData();
+			std::string updatedPlayerData = GetPlayerData();
 		}
 	}
 
-	std::string GetOtherPlayerData(bool isAfterASend = true)
+	std::string GetPlayerData(bool isAfterASend = true)
 	{
-		if (isAfterASend)
+		char buff[7 + 1] = { 0, };
+
+		recv(nClientSocket, buff, sizeof(buff), 0);
+		for (int i = 0; i < 8; i++)
 		{
-			char buff[MAX_BUFFER_SIZE + 1] = { 0, };
-			recv(nClientSocket, buff, MAX_BUFFER_SIZE, 0);
-			std::string tmp;
-			tmp = buff;
-			return tmp;
+			prevBuff[i] = buff[i];
+		}
+		std::string tmpStr = prevBuff;
+
+		int currID = buff[0] - '0';
+
+		if (currID == playerID)
+		{
+			std::cout << std::endl << "I am player " << playerID << ", " << name;
 		}
 		else
 		{
-			return "NOTSENT";
+			std::cout << std::endl << "The other player's data is " << tmpStr;
 		}
+
+		return tmpStr;
 	}
 
 	void SendData()
 	{
-		char* buff;
-		std::string tmpStr = "";
-		switch (playerID)
-		{
-		case 0:
-			tmpStr = "PLAYER0";
-			break;
-		case 1:
-			tmpStr = "PLAYER1";
-			break;
-		case 2:
-			tmpStr = "PLAYER2";
-			break;
-		default:
-			tmpStr = "INVALID";
-			break;
-		}
-		
-		buff = new char(strlen(tmpStr.c_str()) + 1);
-		send(nClientSocket, buff, sizeof(buff), 0);
-
-		delete[] buff;
+		send(nClientSocket, prevBuff, sizeof(prevBuff), 0);
 	}
 };
 
