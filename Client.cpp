@@ -13,5 +13,15 @@ int main(int argc, char* argv[]) {
 	NetworkClient netWorker;
 	netWorker.Connect(tmpStr);
 
+	// GameLoop
+	std::string otherPlayerData;
+	while (true)
+	{
+		// get updated data for other player
+		otherPlayerData = netWorker.UpdateNetworkStuff();
+		
+
+	}
+
 	return EXIT_SUCCESS;
 }

@@ -78,6 +78,12 @@ public:
 		WSACleanup();
 	}
 
+	std::string UpdateNetworkStuff()
+	{
+		SendData();
+		return GetPlayerData();
+	}
+
 private:
 	int playerID{ 0 };
 	std::string name{ "Bart" };
@@ -87,31 +93,13 @@ private:
 	char prevBuff[7 + 1]{ 0, };
 
 	void StartCommunication() {
-		char buff[7 + 1] = { 0, };
-		while (true) {
-			/*
-			send(nClientSocket, prevBuff, sizeof(prevBuff), 0);
-			recv(nClientSocket, buff, MAX_BUFFER_SIZE, 0);
-			for (int i = 0; i < 8; i++)
-			{
-				prevBuff[i] = buff[i];
-			}
-			std::string tmpStr = prevBuff;
-			int currID = buff[0] - '0';
-			if (currID == playerID)
-			{
-				std::cout << std::endl << "I am player " << playerID << ", " << name;
-			}
-			else
-			{
-				std::cout << std::endl << "The other player's data is " << tmpStr;
-			}*/
-			
+		/*while (true)
+		{
 			SendData();
 			std::string updatedPlayerData = GetPlayerData();
-		}
+		}*/
 	}
-
+	
 	std::string GetPlayerData(bool isAfterASend = true)
 	{
 		char buff[7 + 1] = { 0, };
