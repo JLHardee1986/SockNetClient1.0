@@ -109,8 +109,8 @@ private:
 		{
 			prevBuff[i] = buff[i];
 		}
-		std::string tmpStr = prevBuff;
-
+	    const char* tmpStr = prevBuff;
+		std::string newTmpStr = tmpStr;
 		int currID = buff[0] - '0';
 
 		if (currID == playerID)
@@ -119,10 +119,10 @@ private:
 		}
 		else
 		{
-			std::cout << std::endl << "The other player's data is " << tmpStr;
+			std::cout << std::endl << "The other player's data is " << newTmpStr;
 		}
 
-		return tmpStr;
+		return newTmpStr;
 	}
 
 	void SendData()
